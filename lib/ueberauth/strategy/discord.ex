@@ -38,12 +38,23 @@ defmodule Ueberauth.Strategy.Discord do
       conn
       |> store_token(token)
       |> fetch_user(token)
+      |> fetch_connections(token)
+      |> fetch_guilds(token)
     end
   end
 
   @doc false
   def handle_callback!(conn) do
     set_errors!(conn, [error("missing_code", "No code received")])
+  end
+
+  @doc false
+  def handle_cleanup!(conn) do
+    conn
+    |> put_private(:discord_token, nil)
+    |> put_private(:discord_user, nil)
+    |> put_private(:discord_connections, nil)
+    |> put_private(:discord_guilds, nil)
   end
 
   # Store the token for later use.
@@ -67,13 +78,59 @@ defmodule Ueberauth.Strategy.Discord do
     end
   end
 
+  defp split_scopes(token) do
+    (token.other_params["scope"] || "")
+    |> String.split(" ")
+  end
+
+  defp fetch_connections(%Plug.Conn{assigns: %{ueberauth_failure: _fails}} = conn, _), do: conn
+
+  defp fetch_connections(conn, token) do
+    scopes = split_scopes(token)
+
+    case "connections" in scopes do
+      false -> conn
+      true ->
+        path = "https://discordapp.com/api/users/@me/connections"
+        case OAuth2.AccessToken.get(token, path) do
+          {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
+            set_errors!(conn, [error("token", "unauthorized")])
+          {:ok, %OAuth2.Response{status_code: status_code, body: connections}}
+            when status_code in 200..399 ->
+            put_private(conn, :discord_connections, connections)
+          {:error, %OAuth2.Error{reason: reason}} ->
+            set_errors!(conn, [error("OAuth2", reason)])
+        end
+    end
+  end
+
+  defp fetch_guilds(%Plug.Conn{assigns: %{ueberauth_failure: _fails}} = conn, _), do: conn
+
+  defp fetch_guilds(conn, token) do
+    scopes = split_scopes(token)
+
+    case "guilds" in scopes do
+      false -> conn
+      true ->
+        path = "https://discordapp.com/api/users/@me/guilds"
+        case OAuth2.AccessToken.get(token, path) do
+          {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
+            set_errors!(conn, [error("token", "unauthorized")])
+          {:ok, %OAuth2.Response{status_code: status_code, body: guilds}}
+            when status_code in 200..399 ->
+            put_private(conn, :discord_guilds, guilds)
+          {:error, %OAuth2.Error{reason: reason}} ->
+            set_errors!(conn, [error("OAuth2", reason)])
+        end
+    end
+  end
+
   @doc """
   Includes the credentials from the Discord response.
   """
   def credentials(conn) do
     token = conn.private.discord_token
-    scopes = (token.other_params["scope"] || "")
-              |> String.split(",")
+    scopes = split_scopes(token)
 
     %Credentials{
       expires: !!token.expires_at,
@@ -92,21 +149,34 @@ defmodule Ueberauth.Strategy.Discord do
 
     %Info{
       email: user["email"],
-      image: "https://discordcdn.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg",
+      image: fetch_image(user),
       nickname: user["username"]
     }
   end
 
+  defp fetch_image(user) do
+    "https://discordcdn.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg"
+  end
+
   @doc """
-  Stores the raw information (including the token) obtained from the google callback.
+  Stores the raw information (including the token, user, connections and guilds)
+  obtained from the Discord callback.
   """
   def extra(conn) do
-    %Extra{
-      raw_info: %{
-        token: conn.private.discord_token,
-        user: conn.private.discord_user
-      }
+    %{
+      discord_token: :token,
+      discord_user: :user,
+      discord_connections: :connections,
+      discord_guilds: :guilds
     }
+    |> Enum.filter_map(fn {original_key, _} ->
+      Map.has_key?(conn.private, original_key)
+      end,
+      fn {original_key, mapped_key} ->
+        {mapped_key, Map.fetch!(conn.private, original_key)}
+      end)
+    |> Map.new()
+    |> (&(%Extra{raw_info: &1})).()
   end
 
   @doc """
@@ -120,7 +190,6 @@ defmodule Ueberauth.Strategy.Discord do
 
     conn.private.discord_user[uid_field]
   end
-
 
   defp option(conn, key) do
     Dict.get(options(conn), key, Dict.get(default_options, key))

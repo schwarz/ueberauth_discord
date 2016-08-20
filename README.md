@@ -81,7 +81,7 @@ By default the requested scope is "identify". Scope can be configured either exp
 ```elixir
 config :ueberauth, Ueberauth,
   providers: [
-    discord: {Ueberauth.Strategy.Discord, [default_scope: "identify email"]}
+    discord: {Ueberauth.Strategy.Discord, [default_scope: "identify email connections guilds"]}
   ]
 ```
 
