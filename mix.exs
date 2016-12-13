@@ -15,7 +15,8 @@ defmodule UeberauthDiscord.Mixfile do
      homepage_url: @url,
      description: description(),
      package: package(),
-     deps: deps()]
+     deps: deps(),
+     docs: docs()]
   end
 
   def application do
@@ -24,7 +25,13 @@ defmodule UeberauthDiscord.Mixfile do
 
   defp deps do
     [{:ueberauth, "~> 0.4"},
-     {:oauth2, "~> 0.8"}]
+     {:oauth2, "~> 0.8"},
+     {:ex_doc, "~> 0.3", only: :dev},
+     {:earmark, ">= 0.0.0", only: :dev}]
+  end
+
+  defp docs do
+    [extras: ["README.md"]]
   end
 
   defp description do
