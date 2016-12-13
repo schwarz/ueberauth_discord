@@ -65,7 +65,7 @@ defmodule Ueberauth.Strategy.Discord do
 
   defp fetch_user(conn, token) do
     path = "https://discordapp.com/api/users/@me"
-    resp = OAuth2.AccessToken.get(token, path)
+    resp = Ueberauth.Strategy.Discord.OAuth.get(token, path)
 
     case resp do
       {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
@@ -92,7 +92,7 @@ defmodule Ueberauth.Strategy.Discord do
       false -> conn
       true ->
         path = "https://discordapp.com/api/users/@me/connections"
-        case OAuth2.AccessToken.get(token, path) do
+        case Ueberauth.Strategy.Discord.OAuth.get(token, path) do
           {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
             set_errors!(conn, [error("token", "unauthorized")])
           {:ok, %OAuth2.Response{status_code: status_code, body: connections}}
@@ -113,7 +113,7 @@ defmodule Ueberauth.Strategy.Discord do
       false -> conn
       true ->
         path = "https://discordapp.com/api/users/@me/guilds"
-        case OAuth2.AccessToken.get(token, path) do
+        case Ueberauth.Strategy.Discord.OAuth.get(token, path) do
           {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
             set_errors!(conn, [error("token", "unauthorized")])
           {:ok, %OAuth2.Response{status_code: status_code, body: guilds}}

@@ -1,7 +1,7 @@
 defmodule UeberauthDiscord.Mixfile do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.3.0"
   @url "https://github.com/schwarz/ueberauth_discord"
 
   def project do
@@ -13,6 +13,8 @@ defmodule UeberauthDiscord.Mixfile do
      start_permanent: Mix.env == :prod,
      source_url: @url,
      homepage_url: @url,
+     description: description(),
+     package: package(),
      deps: deps()]
   end
 
@@ -21,7 +23,18 @@ defmodule UeberauthDiscord.Mixfile do
   end
 
   defp deps do
-    [{:ueberauth, "~> 0.3"},
-     {:oauth2, "~> 0.5"}]
+    [{:ueberauth, "~> 0.4"},
+     {:oauth2, "~> 0.8"}]
+  end
+
+  defp description do
+    "An Uberauth strategy for Discord authentication."
+  end
+
+  defp package do
+    [files: ["lib", "mix.exs", "README.md", "LICENSE"],
+     maintainers: ["Bernhard Schwarz"],
+     licenses: ["MIT"],
+     links: %{"GitHub": @url}]
   end
 end
