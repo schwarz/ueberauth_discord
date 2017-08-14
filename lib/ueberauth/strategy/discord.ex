@@ -155,7 +155,7 @@ defmodule Ueberauth.Strategy.Discord do
   end
 
   defp fetch_image(user) do
-    "https://discordcdn.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg"
+    "https://cdn.discordapp.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg"
   end
 
   @doc """
