@@ -62,6 +62,8 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
     end
     ```
 
+    And make sure to set the correct redirect URI(s) in your Discord application to wire up the callback.
+
 1. Your controller needs to implement callbacks to deal with `Ueberauth.Auth` and `Ueberauth.Failure` responses.
 
 For an example implementation see the [Überauth Example](https://github.com/ueberauth/ueberauth_example) application.
