@@ -12,7 +12,7 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
 
     ```elixir
     def deps do
-      [{:ueberauth_discord, "~> 0.3"}]
+      [{:ueberauth_discord, "~> 0.4"}]
     end
     ```
 
@@ -70,7 +70,7 @@ For an example implementation see the [Überauth Example](https://github.com/ueb
 
 ## Calling
 
-Depending on the configured url you can initial the request through:
+Depending on the configured url you can initialize the request through:
 
     /auth/discord
 
@@ -86,6 +86,19 @@ config :ueberauth, Ueberauth,
     discord: {Ueberauth.Strategy.Discord, [default_scope: "identify email connections guilds"]}
   ]
 ```
+
+Additionally you can now specify the `prompt` param to pass to Discord:
+
+```elixir
+config :ueberauth, Ueberauth,
+  providers: [
+    discord: {Ueberauth.Strategy.Discord, [
+      default_scope: "identify email connections guilds",
+      prompt: "none"
+    ]}
+  ]
+```
+
 
 ## License
 

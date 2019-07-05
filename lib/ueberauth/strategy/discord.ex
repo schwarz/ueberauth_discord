@@ -14,12 +14,16 @@ defmodule Ueberauth.Strategy.Discord do
   """
   def handle_request!(conn) do
     scopes = conn.params["scope"] || option(conn, :default_scope)
-    opts = [scope: scopes]
-    opts = if conn.params["state"] do
-      Keyword.put(opts, :state, conn.params["state"])
-    else
-      opts
-    end
+    prompt = conn.params["prompt"] || option(conn, :prompt)
+    opts = [scope: scopes, prompt: prompt]
+
+    opts =
+      if conn.params["state"] do
+        Keyword.put(opts, :state, conn.params["state"])
+      else
+        opts
+      end
+
     opts = Keyword.put(opts, :redirect_uri, callback_url(conn))
 
     redirect!(conn, Ueberauth.Strategy.Discord.OAuth.authorize_url!(opts))
@@ -70,9 +74,11 @@ defmodule Ueberauth.Strategy.Discord do
     case resp do
       {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
         set_errors!(conn, [error("token", "unauthorized")])
+
       {:ok, %OAuth2.Response{status_code: status_code, body: user}}
-        when status_code in 200..399 ->
+      when status_code in 200..399 ->
         put_private(conn, :discord_user, user)
+
       {:error, %OAuth2.Error{reason: reason}} ->
         set_errors!(conn, [error("OAuth2", reason)])
     end
@@ -89,15 +95,20 @@ defmodule Ueberauth.Strategy.Discord do
     scopes = split_scopes(token)
 
     case "connections" in scopes do
-      false -> conn
+      false ->
+        conn
+
       true ->
         path = "https://discordapp.com/api/users/@me/connections"
+
         case Ueberauth.Strategy.Discord.OAuth.get(token, path) do
           {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
             set_errors!(conn, [error("token", "unauthorized")])
+
           {:ok, %OAuth2.Response{status_code: status_code, body: connections}}
-            when status_code in 200..399 ->
+          when status_code in 200..399 ->
             put_private(conn, :discord_connections, connections)
+
           {:error, %OAuth2.Error{reason: reason}} ->
             set_errors!(conn, [error("OAuth2", reason)])
         end
@@ -110,15 +121,20 @@ defmodule Ueberauth.Strategy.Discord do
     scopes = split_scopes(token)
 
     case "guilds" in scopes do
-      false -> conn
+      false ->
+        conn
+
       true ->
         path = "https://discordapp.com/api/users/@me/guilds"
+
         case Ueberauth.Strategy.Discord.OAuth.get(token, path) do
           {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
             set_errors!(conn, [error("token", "unauthorized")])
+
           {:ok, %OAuth2.Response{status_code: status_code, body: guilds}}
-            when status_code in 200..399 ->
+          when status_code in 200..399 ->
             put_private(conn, :discord_guilds, guilds)
+
           {:error, %OAuth2.Error{reason: reason}} ->
             set_errors!(conn, [error("OAuth2", reason)])
         end
@@ -169,14 +185,16 @@ defmodule Ueberauth.Strategy.Discord do
       discord_connections: :connections,
       discord_guilds: :guilds
     }
-    |> Enum.filter_map(fn {original_key, _} ->
-      Map.has_key?(conn.private, original_key)
+    |> Enum.filter_map(
+      fn {original_key, _} ->
+        Map.has_key?(conn.private, original_key)
       end,
       fn {original_key, mapped_key} ->
         {mapped_key, Map.fetch!(conn.private, original_key)}
-      end)
+      end
+    )
     |> Map.new()
-    |> (&(%Extra{raw_info: &1})).()
+    |> (&%Extra{raw_info: &1}).()
   end
 
   @doc """
@@ -192,7 +210,6 @@ defmodule Ueberauth.Strategy.Discord do
   end
 
   defp option(conn, key) do
-    Dict.get(options(conn), key, Dict.get(default_options, key))
+    Dict.get(options(conn), key, Dict.get(default_options(), key))
   end
-
 end
