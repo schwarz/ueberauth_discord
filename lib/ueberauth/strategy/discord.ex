@@ -20,6 +20,13 @@ defmodule Ueberauth.Strategy.Discord do
     else
       opts
     end
+
+    opts = if conn.params["prompt"] do
+      Keyword.put(opts, :prompt, conn.params["prompt"])
+    else
+      opts
+    end
+
     opts = Keyword.put(opts, :redirect_uri, callback_url(conn))
 
     redirect!(conn, Ueberauth.Strategy.Discord.OAuth.authorize_url!(opts))
