@@ -12,7 +12,7 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
 
     ```elixir
     def deps do
-      [{:ueberauth_discord, "~> 0.4"}]
+      [{:ueberauth_discord, "~> 0.5"}]
     end
     ```
 
