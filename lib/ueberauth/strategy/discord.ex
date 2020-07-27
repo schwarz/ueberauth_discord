@@ -171,10 +171,10 @@ defmodule Ueberauth.Strategy.Discord do
   end
 
   defp fetch_image(user) do
-    if user["avatar"] == nil do
-      "https://cdn.discordapp.com/embed/avatars/#{Integer.mod(String.to_integer(user["discriminator"]), 5)}.png"
-    else
+    if user["avatar"] do
       "https://cdn.discordapp.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg"
+    else
+      "https://cdn.discordapp.com/embed/avatars/#{Integer.mod(String.to_integer(user["discriminator"]), 5)}.png"
     end
   end
 
