@@ -13,9 +13,9 @@ defmodule Ueberauth.Strategy.Discord.OAuth do
 
   @defaults [
     strategy: __MODULE__,
-    site: "https://discordapp.com/api",
-    authorize_url: "https://discordapp.com/api/oauth2/authorize",
-    token_url: "https://discordapp.com/api/oauth2/token"
+    site: "https://discord.com/api",
+    authorize_url: "https://discord.com/api/oauth2/authorize",
+    token_url: "https://discord.com/api/oauth2/token"
   ]
 
 

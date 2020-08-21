@@ -68,7 +68,7 @@ defmodule Ueberauth.Strategy.Discord do
   end
 
   defp fetch_user(conn, token) do
-    path = "https://discordapp.com/api/users/@me"
+    path = "https://discord.com/api/users/@me"
     resp = Ueberauth.Strategy.Discord.OAuth.get(token, path)
 
     case resp do
@@ -99,7 +99,7 @@ defmodule Ueberauth.Strategy.Discord do
         conn
 
       true ->
-        path = "https://discordapp.com/api/users/@me/connections"
+        path = "https://discord.com/api/users/@me/connections"
 
         case Ueberauth.Strategy.Discord.OAuth.get(token, path) do
           {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
@@ -125,7 +125,7 @@ defmodule Ueberauth.Strategy.Discord do
         conn
 
       true ->
-        path = "https://discordapp.com/api/users/@me/guilds"
+        path = "https://discord.com/api/users/@me/guilds"
 
         case Ueberauth.Strategy.Discord.OAuth.get(token, path) do
           {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->

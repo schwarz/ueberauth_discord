@@ -6,13 +6,13 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
 
 ## Installation
 
-1. Setup your application at [Discord Developers](https://discordapp.com/developers/applications/me).
+1. Setup your application at [Discord Developers](https://discord.com/developers/applications/me).
 
 1. Add `:ueberauth_discord` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
-      [{:ueberauth_discord, "~> 0.5"}]
+      [{:ueberauth_discord, "~> 0.5.2"}]
     end
     ```
 
