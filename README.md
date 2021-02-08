@@ -76,7 +76,7 @@ Depending on the configured url you can initialize the request through:
 
 Or with options:
 
-    /auth/discord?scope=identify%20email
+    /auth/discord?scope=identify%20email&prompt=none&permissions=452987952
 
 By default the requested scope is "identify". Scope can be configured either explicitly as a `scope` query value on the request path or in your configuration:
 
@@ -87,14 +87,15 @@ config :ueberauth, Ueberauth,
   ]
 ```
 
-Additionally you can now specify the `prompt` param to pass to Discord:
+Additionally you can now specify the `prompt` and `permissions` params to pass to Discord:
 
 ```elixir
 config :ueberauth, Ueberauth,
   providers: [
     discord: {Ueberauth.Strategy.Discord, [
       default_scope: "identify email connections guilds",
-      prompt: "none"
+      prompt: "none",
+      permissions: 452987952
     ]}
   ]
 ```
