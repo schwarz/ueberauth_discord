@@ -20,6 +20,8 @@ defmodule Ueberauth.Strategy.Discord do
       |> with_optional_param_or_default(:prompt, conn)
       |> with_optional_param_or_default(:permissions, conn)
       |> with_optional_param_or_default(:state, conn)
+      |> with_optional_param_or_default(:guild_id, conn)
+      |> with_optional_param_or_default(:disable_guild_select, conn)
       |> Keyword.put(:redirect_uri, callback_url(conn))
 
     redirect!(conn, Ueberauth.Strategy.Discord.OAuth.authorize_url!(opts))
@@ -170,9 +172,7 @@ defmodule Ueberauth.Strategy.Discord do
     if user["avatar"] do
       "https://cdn.discordapp.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg"
     else
-      "https://cdn.discordapp.com/embed/avatars/#{
-        Integer.mod(String.to_integer(user["discriminator"]), 5)
-      }.png"
+      "https://cdn.discordapp.com/embed/avatars/#{Integer.mod(String.to_integer(user["discriminator"]), 5)}.png"
     end
   end
 
