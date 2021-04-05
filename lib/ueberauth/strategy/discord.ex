@@ -14,17 +14,13 @@ defmodule Ueberauth.Strategy.Discord do
   """
   def handle_request!(conn) do
     scopes = conn.params["scope"] || option(conn, :default_scope)
-    prompt = conn.params["prompt"] || option(conn, :prompt)
-    opts = [scope: scopes, prompt: prompt]
 
     opts =
-      if conn.params["state"] do
-        Keyword.put(opts, :state, conn.params["state"])
-      else
-        opts
-      end
-
-    opts = Keyword.put(opts, :redirect_uri, callback_url(conn))
+      [scope: scopes]
+      |> with_optional_param_or_default(:prompt, conn)
+      |> with_optional_param_or_default(:permissions, conn)
+      |> with_optional_param_or_default(:state, conn)
+      |> Keyword.put(:redirect_uri, callback_url(conn))
 
     redirect!(conn, Ueberauth.Strategy.Discord.OAuth.authorize_url!(opts))
   end
@@ -215,5 +211,18 @@ defmodule Ueberauth.Strategy.Discord do
 
   defp option(conn, key) do
     Keyword.get(options(conn), key, Keyword.get(default_options(), key))
+  end
+
+  defp with_optional_param_or_default(opts, key, conn) do
+    cond do
+      value = conn.params[to_string(key)] ->
+        Keyword.put(opts, key, value)
+
+      default_opt = option(conn, key) ->
+        Keyword.put(opts, key, default_opt)
+
+      true ->
+        opts
+    end
   end
 end
