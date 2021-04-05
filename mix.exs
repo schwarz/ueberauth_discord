@@ -1,7 +1,7 @@
 defmodule UeberauthDiscord.Mixfile do
   use Mix.Project
 
-  @version "0.5.2"
+  @version "0.6.0"
   @url "https://github.com/schwarz/ueberauth_discord"
 
   def project do
