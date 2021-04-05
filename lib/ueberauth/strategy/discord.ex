@@ -170,7 +170,9 @@ defmodule Ueberauth.Strategy.Discord do
     if user["avatar"] do
       "https://cdn.discordapp.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg"
     else
-      "https://cdn.discordapp.com/embed/avatars/#{Integer.mod(String.to_integer(user["discriminator"]), 5)}.png"
+      "https://cdn.discordapp.com/embed/avatars/#{
+        Integer.mod(String.to_integer(user["discriminator"]), 5)
+      }.png"
     end
   end
 
@@ -185,14 +187,12 @@ defmodule Ueberauth.Strategy.Discord do
       discord_connections: :connections,
       discord_guilds: :guilds
     }
-    |> Enum.filter_map(
-      fn {original_key, _} ->
-        Map.has_key?(conn.private, original_key)
-      end,
-      fn {original_key, mapped_key} ->
-        {mapped_key, Map.fetch!(conn.private, original_key)}
-      end
-    )
+    |> Enum.filter(fn {original_key, _} ->
+      Map.has_key?(conn.private, original_key)
+    end)
+    |> Enum.map(fn {original_key, mapped_key} ->
+      {mapped_key, Map.fetch!(conn.private, original_key)}
+    end)
     |> Map.new()
     |> (&%Extra{raw_info: &1}).()
   end
@@ -210,7 +210,8 @@ defmodule Ueberauth.Strategy.Discord do
   end
 
   defp option(conn, key) do
-    Dict.get(options(conn), key, Dict.get(default_options(), key))
+    Keyword.get(options(conn), key, Keyword.get(default_options(), key))
+  end
 
   defp with_optional_param_or_default(opts, key, conn) do
     cond do
