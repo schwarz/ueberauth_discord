@@ -19,7 +19,7 @@ defmodule Ueberauth.Strategy.Discord do
       [scope: scopes]
       |> with_optional_param_or_default(:prompt, conn)
       |> with_optional_param_or_default(:permissions, conn)
-      |> with_optional_param_or_default(:state, conn)
+      |> Keyword.put(:state, conn.params["state"])
       |> Keyword.put(:redirect_uri, callback_url(conn))
 
     redirect!(conn, Ueberauth.Strategy.Discord.OAuth.authorize_url!(opts))
