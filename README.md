@@ -16,14 +16,6 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
     end
     ```
 
-1. Add the strategy to your applications:
-
-    ```elixir
-    def application do
-      [applications: [:ueberauth_discord]]
-    end
-    ```
-
 1. Add Discord to your Überauth configuration:
 
     ```elixir
