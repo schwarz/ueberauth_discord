@@ -62,6 +62,8 @@ For an example implementation see the [Überauth Example](https://github.com/ueb
 
 ## Calling
 
+### Auth
+
 Depending on the configured url you can initialize the request through:
 
     /auth/discord
@@ -79,7 +81,7 @@ config :ueberauth, Ueberauth,
   ]
 ```
 
-Additionally you can now specify the `prompt` and `permissions` params to pass to Discord:
+You can also specify the `prompt` and `permissions` params to pass to Discord:
 
 ```elixir
 config :ueberauth, Ueberauth,
@@ -92,6 +94,32 @@ config :ueberauth, Ueberauth,
   ]
 ```
 
+### Bot
+
+This library can also be used to add bots to guilds. 
+
+When adding bots, the `scope` should be set to `bot` and `permissions` should be set so your bot can perform actions in the host guild.
+
+You can use the following parameters in addition to the ones specified for the user auth flow:
+- `guild_id` - pre-select the guild to which the bot will be added
+- `disable_guild_select` - disable the dropdown to select a guild (can improve UX by limiting choices)
+
+Usage would look like the following:
+```elixir
+your_link_building_method(
+  :request,
+  "discord",
+  scope: "bot",
+  guild_id: guild_id,
+  disable_guild_select: true,
+  permissions: my_default_bot_permissions()
+)
+```
+
+This should produce a link with the following format: 
+```bash
+https://discord.com/oauth2/authorize?client_id=<YOUR_CLIENT_ID>&disable_guild_select=true&guild_id=<SOME_GUILD_ID>&permissions=<DEFAULT_BOT_PERMISSIONS>&redirect_uri=<YOUR_DISCORD_CALLBACK_URI>&response_type=code&scope=bot&state=ebla7tFnIyX_FdmY5wjW8u7NJkc
+```
 
 ## License
 

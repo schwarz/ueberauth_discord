@@ -19,6 +19,8 @@ defmodule Ueberauth.Strategy.Discord do
       [scope: scopes]
       |> with_optional_param_or_default(:prompt, conn)
       |> with_optional_param_or_default(:permissions, conn)
+      |> with_optional_param_or_default(:guild_id, conn)
+      |> with_optional_param_or_default(:disable_guild_select, conn)
       |> with_state_param(conn)
       |> Keyword.put(:redirect_uri, callback_url(conn))
 
