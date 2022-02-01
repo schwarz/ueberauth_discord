@@ -1,5 +1,7 @@
 # Überauth Discord
 
+[![Hex pm](https://img.shields.io/hexpm/v/ueberauth_discord.svg?style=flat)](https://hex.pm/packages/ueberauth_discord) [![Hexdocs.pm](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/ueberauth_discord/)
+
 > Discord OAuth2 strategy for Überauth.
 
 For additional documentation on Discord's OAuth implementation see [discord-oauth2-example](https://github.com/hammerandchisel/discord-oauth2-example).
