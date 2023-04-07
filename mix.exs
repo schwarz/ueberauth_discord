@@ -27,7 +27,7 @@ defmodule UeberauthDiscord.Mixfile do
 
   defp deps do
     [
-      {:ueberauth, "~> 0.7"},
+      {:ueberauth, "~> 0.10"},
       {:oauth2, "~> 1.0 or ~> 2.0"},
       {:ex_doc, "~> 0.27", only: :dev},
       {:earmark, ">= 0.0.0", only: :dev}
