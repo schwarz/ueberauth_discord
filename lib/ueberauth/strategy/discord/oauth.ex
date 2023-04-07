@@ -18,7 +18,6 @@ defmodule Ueberauth.Strategy.Discord.OAuth do
     token_url: "https://discord.com/api/oauth2/token"
   ]
 
-
   @doc """
   Construct a client for requests to Discord.
   This will be setup automatically for you in `Ueberauth.Strategy.Discord`.
@@ -26,13 +25,8 @@ defmodule Ueberauth.Strategy.Discord.OAuth do
   of Ueberauth.
   """
   def client(opts \\ []) do
-    config = Application.get_env(:ueberauth, Ueberauth.Strategy.Discord.OAuth)
-
-    opts =
-      @defaults
-      |> Keyword.merge(config)
-      |> Keyword.merge(opts)
-
+    config = Application.get_env(:ueberauth, __MODULE__, [])
+    opts = @defaults |> Keyword.merge(config) |> Keyword.merge(opts) |> resolve_values()
     json_library = Ueberauth.json_library()
 
     OAuth2.Client.new(opts)
@@ -50,7 +44,7 @@ defmodule Ueberauth.Strategy.Discord.OAuth do
   end
 
   def get(token, url, headers \\ [], opts \\ []) do
-    client([token: token])
+    client(token: token)
     |> put_param("client_secret", client().client_secret)
     |> OAuth2.Client.get(url, headers, opts)
   end
@@ -60,6 +54,7 @@ defmodule Ueberauth.Strategy.Discord.OAuth do
       opts
       |> client
       |> OAuth2.Client.get_token!(params)
+
     client.token
   end
 
@@ -75,4 +70,13 @@ defmodule Ueberauth.Strategy.Discord.OAuth do
     |> put_header("Accept", "application/json")
     |> OAuth2.Strategy.AuthCode.get_token(params, headers)
   end
+
+  defp resolve_values(list) do
+    for {key, value} <- list do
+      {key, resolve_value(value)}
+    end
+  end
+
+  defp resolve_value({m, f, a}) when is_atom(m) and is_atom(f), do: apply(m, f, a)
+  defp resolve_value(v), do: v
 end
